@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 const _ = require('lodash');
 const app = express();
-mongoose.connect('mongodb://localhost:27017/toDoListDB', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb+srv://danildany:nestor98@cluster0.dcp1i.mongodb.net/toDoListDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 //let items = ['hacer el desayuno','descaragar la documentacion'];
 //let workItems = [];
@@ -32,11 +32,11 @@ const item2 = new Item({
     name:'Terminar el projecto React.js'
 })
 const item3 = new Item({
-    name:'Terminar el projecto DataaBases'
+    name:'Terminar el projecto DataBases'
 })
 
 
-const defaultItems = [];
+const defaultItems = [item1,item2,item3];
 
 app.get("/",function(req,res){
     Item.find({},(error,itemsFound)=>{
