@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require('mongoose');
+const _ = require('lodash');
 const app = express();
 mongoose.connect('mongodb://localhost:27017/toDoListDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -78,6 +79,8 @@ app.post("/",function(req,res){
 
 app.post("/delete",(req,res)=>{
     const checkedItem = req.body.checkbox;
+    const listName = req.body.listName
+    if(listName === 'Today'){
     Item.findByIdAndRemove(checkedItem,(error)=>{
         if(error){
             console.log(error)
@@ -86,10 +89,17 @@ app.post("/delete",(req,res)=>{
             res.redirect('/');
         }
     });
+    }else{
+        List.findOneAndUpdate({name:listName},{$pull:{items:{_id:checkedItem}}},(error,foundList)=>{
+            if(!error){
+            res.redirect("/" + listName);
+            }    
+        });
+    }
 });
 
 app.get("/:customListName",function(req,res){
-    const customListName = req.params.customListName;
+    const customListName = _.capitalize(req.params.customListName);
     List.findOne({name:customListName},(error,foundList)=>{
         if(!error){
             if(!foundList){
