@@ -27,35 +27,20 @@ const Item = mongoose.model("Item", itemsSchema);
 const List = mongoose.model("List", listSchema);
 
 const item1 = new Item({
-  name: "Terminar el projecto Node.js",
+  name: "Agregar tareas a la lista",
 });
 
-const item2 = new Item({
-  name: "Terminar el projecto React.js",
-});
-const item3 = new Item({
-  name: "Terminar el projecto DataBases",
-});
-
-const defaultItems = [item1, item2, item3];
+const defaultItem = [item1];
 
 app.get("/", function (req, res) {
   Item.find({}, (error, itemsFound) => {
-    if (itemsFound.length === 0) {
-      Item.insertMany(defaultItems, (error) => {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log("todo bien¡¡");
-        }
-      });
-      res.redirect("/");
+    if (error) {
+      console.log(error);
     } else {
       res.render("list.ejs", { listTitle: "Today", anotherItem: itemsFound });
     }
   });
 });
-
 app.post("/", function (req, res) {
   const itemName = req.body.newItem;
   const listName = req.body.list;
@@ -75,8 +60,13 @@ app.post("/", function (req, res) {
   } else {
     List.findOne({ name: listName }, (error, foundList) => {
       foundList.items.push(item);
-      foundList.save();
-      res.redirect("/" + listName);
+      if (!item.name) {
+        console.log("no escribiste nada gilazo");
+        res.redirect("/" + listName);
+      } else {
+        foundList.save();
+        res.redirect("/" + listName);
+      }
     });
   }
 });
@@ -113,7 +103,7 @@ app.get("/:customListName", function (req, res) {
       if (!foundList) {
         const list = new List({
           name: customListName,
-          items: defaultItems,
+          items: defaultItem,
         });
         list.save();
         res.redirect("/" + customListName);
@@ -125,9 +115,6 @@ app.get("/:customListName", function (req, res) {
       }
     }
   });
-});
-app.get("/about", function (req, res) {
-  res.render("about");
 });
 
 let port = process.env.PORT;
